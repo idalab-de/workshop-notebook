@@ -9,25 +9,29 @@ def plot_decision_boundary(max_depth=1):
     This function plots the decision boundary for the iris dataset classified by a decision tree.
     '''
     # Parameters
-    n_classes = 3
-    plot_colors = "ryb"
+    n_classes = 2
+    plot_colors = "rb"
     plot_step = 0.02
 
     # Load data
     iris = load_iris()
     plt.figure(figsize=(30,15))
 
-    for pairidx, pair in enumerate([[0, 1], [0, 2], [0, 3],
-                                    [1, 2], [1, 3], [2, 3]]):
+    for pairidx, pair in enumerate([[0, 1], 
+#                                     [0, 2], [0, 3],
+#                                     [1, 2], [1, 3], [2, 3]
+                                   ]):
         # We only take the two corresponding features
         X = iris.data[:, pair]
         y = iris.target
+        X = X[y!=0,:]
+        y = y[y!=0] -1 
 
         # Train
         clf = DecisionTreeClassifier(max_depth=max_depth).fit(X, y)
 
         # Plot the decision boundary
-        plt.subplot(2, 3, pairidx + 1)
+        plt.subplot(1, 1, pairidx + 1)
 
         x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
         y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -46,8 +50,8 @@ def plot_decision_boundary(max_depth=1):
         for i, color in zip(range(n_classes), plot_colors):
             idx = np.where(y == i)
             plt.scatter(X[idx, 0], X[idx, 1], c=color, label=iris.target_names[i],
-                        cmap=plt.cm.RdYlBu, edgecolor='black', s=40)
+                        cmap=plt.cm.RdYlBu, edgecolor='black', s=300, linewidths=3)
 
-    plt.legend(loc='lower right', borderpad=0, handletextpad=0)
+    plt.legend(loc='lower right', borderpad=0, handletextpad=0, prop={'size': 50})
     plt.axis("tight")
     plt.show()
