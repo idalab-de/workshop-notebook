@@ -6,7 +6,7 @@ from matplotlib.cbook import get_sample_data
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
 
-def plot_decision_boundary(max_depth=1):
+def plot_decision_boundary(complexity=1):
     '''
     This function plots the decision boundary for the iris dataset classified by a decision tree.
     '''
@@ -32,7 +32,7 @@ def plot_decision_boundary(max_depth=1):
         y = y[y!=0] -1 
 
         # Train
-        clf = DecisionTreeClassifier(max_depth=max_depth).fit(X, y)
+        clf = DecisionTreeClassifier(max_depth=complexity).fit(X, y)
 
         # Plot the decision boundary
         plt.subplot(1, 1, pairidx + 1)
