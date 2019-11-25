@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from matplotlib.cbook import get_sample_data
 
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
@@ -10,7 +12,7 @@ def plot_decision_boundary(max_depth=1):
     '''
     # Parameters
     n_classes = 2
-    plot_colors = "rb"
+    images = ['orange.png', 'apple.png']
     plot_step = 0.02
 
     # Load data
@@ -23,6 +25,8 @@ def plot_decision_boundary(max_depth=1):
                                    ]):
         # We only take the two corresponding features
         X = iris.data[:, pair]
+        X[:,1] = X[:,1] +1.2
+        X[:,0] = X[:,0] * 30
         y = iris.target
         X = X[y!=0,:]
         y = y[y!=0] -1 
@@ -41,17 +45,35 @@ def plot_decision_boundary(max_depth=1):
 
         Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
         Z = Z.reshape(xx.shape)
-        cs = plt.contourf(xx, yy, Z, cmap=plt.cm.RdYlBu)
+        cs = plt.contourf(xx, yy, Z, cmap=plt.cm.YlOrRd, vmin=-0.5, vmax=2.3)
 
-        plt.xlabel(iris.feature_names[pair[0]], fontsize = 20)
-        plt.ylabel(iris.feature_names[pair[1]], fontsize = 20)
+        plt.xlabel('Weight [g]', fontsize = 20)
+        plt.ylabel('Diameter [cm]', fontsize = 20)
 
         # Plot the training points
-        for i, color in zip(range(n_classes), plot_colors):
+        for i, image in zip(range(n_classes), images):
             idx = np.where(y == i)
-            plt.scatter(X[idx, 0], X[idx, 1], c=color, label=iris.target_names[i],
-                        cmap=plt.cm.RdYlBu, edgecolor='black', s=300, linewidths=3)
+            imscatter(X[idx, 0][0], X[idx, 1][0], image)
 
-    plt.legend(loc='lower right', borderpad=0, handletextpad=0, prop={'size': 50})
+#     plt.legend(loc='lower right', borderpad=0, handletextpad=0, prop={'size': 50})
     plt.axis("tight")
     plt.show()
+    
+    
+def imscatter(x, y, image, ax=None, zoom=1):
+    if ax is None:
+        ax = plt.gca()
+    try:
+        image = plt.imread(image)
+    except TypeError:
+        # Likely already an array...
+        pass
+    im = OffsetImage(image, zoom=zoom)
+    x, y = np.atleast_1d(x, y)
+    artists = []
+    for x0, y0 in zip(x, y):
+        ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False)
+        artists.append(ax.add_artist(ab))
+    ax.update_datalim(np.column_stack([x, y]))
+    ax.autoscale()
+    return artists
